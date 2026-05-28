@@ -5,12 +5,7 @@
 % ------------------------------------------------------------
 % 中文摘要
 % ------------------------------------------------------------
-\begin{center}
-    {\sanhao\sffamily\bfseries 摘\quad 要}
-\end{center}
-\addcontentsline{toc}{chapter}{摘要}
-
-\vspace{0.5cm}
+\begin{cabstractpage}
 
 随着科学技术的快速发展，学术论文的排版质量越来越受到重视。LaTeX 作为一种专业的排版系统，以其高质量的输出效果和强大的数学公式处理能力，在学术界得到了广泛的应用。本文针对心河大学学位论文的排版需求，设计并实现了一套基于 LaTeX 的论文排版模板系统。
 
@@ -20,20 +15,17 @@
 
 通过实际应用测试，本模板能够较好地满足心河大学学位论文的排版需求，生成的PDF文档格式规范、美观大方，具有较高的实用价值。
 
-\vspace{1cm}
-\noindent\textbf{关键词：}LaTeX；学位论文；排版模板；GB/T 7714
+\vspace{\baselineskip}
 
-\newpage
+\noindent\hspace*{2\ccwd}%
+{\textbf{关键词：}LaTeX；学位论文；排版模板；GB/T 7714}
+
+\end{cabstractpage}
 
 % ------------------------------------------------------------
 % 英文摘要
 % ------------------------------------------------------------
-\begin{center}
-    {\sanhao\bfseries Abstract}
-\end{center}
-\addcontentsline{toc}{chapter}{Abstract}
-
-\vspace{0.5cm}
+\begin{eabstractpage}
 
 With the rapid development of science and technology, the quality of academic paper typesetting has received increasing attention. As a professional typesetting system, LaTeX has been widely used in academia due to its high-quality output and powerful mathematical formula processing capabilities. This thesis designs and implements a LaTeX-based thesis template system for the typesetting requirements of domestic university dissertations.
 
@@ -43,5 +35,9 @@ The main contributions of this thesis include: (1) designing a page layout and f
 
 Through practical application testing, this template can well meet the typesetting requirements of domestic university dissertations. The generated PDF documents are well-formatted and aesthetically pleasing, demonstrating high practical value.
 
-\vspace{1cm}
-\noindent\textbf{Keywords:} LaTeX; Dissertation; Typesetting Template; GB/T 7714
+\vspace{\baselineskip}
+
+\noindent\hspace*{2\ccwd}%
+{\textbf{Keywords: }LaTeX; Dissertation; Typesetting Template; GB/T 7714}
+
+\end{eabstractpage}

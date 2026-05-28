@@ -30,7 +30,7 @@
     top=2.5cm,
     bottom=2.5cm,
     headheight=15pt,
-    headsep=20pt,
+    headsep=0pt,
     footskip=30pt
 }
 
@@ -81,19 +81,24 @@
 % ------------------------------------------------------------
 % 字体设置
 % ------------------------------------------------------------
-% 中文字体：宋体(正文)、黑体(标题)
+% 中文字体：宋体(正文)、黑体(标题)、楷体(页眉)
 \setCJKmainfont{SimSun}[AutoFakeBold=true,AutoFakeSlant=true]     % 宋体 - 正文
 \setCJKsansfont{SimHei}[AutoFakeBold=true]                         % 黑体 - 标题
 \setCJKmonofont{SimSun}                                             % 宋体 - 等宽备选
 
 % 英文字体：Times New Roman
 \setmainfont{Times New Roman}
-\setsansfont{Arial}
+\setsansfont{Times New Roman}
 \setmonofont{Courier New}
 
-\setmainfont{Times New Roman}   % 英文正文
-\setsansfont{Arial}             % 英文无衬线
-\setmonofont{Courier New}       % 英文等宽
+% 楷体_GB2312（页眉专用）
+\setCJKfamilyfont{kaitigb2312}{kaiti_GB2312.TTF}[Path=./font/,AutoFakeBold=true]
+
+% 仿宋字体
+\setCJKfamilyfont{myfangsong}{SIMFANG.TTF}[Path=./font/,AutoFakeBold=true]
+\setCJKfamilyfont{myfangsonggb}{fangsong_GB2312.ttf}[Path=./font/,AutoFakeBold=true]
+\newcommand{\myfangsong}{\CJKfamily{myfangsong}}
+\newcommand{\myfangsonggb}{\CJKfamily{myfangsonggb}}
 
 % ------------------------------------------------------------
 % 字号设置 (pt)
@@ -121,25 +126,26 @@
 % ------------------------------------------------------------
 \ctexset{
     chapter = {
-        format = \centering\sffamily\xiaoer\bfseries,
+        format = \centering\sffamily\sanhao,
         name = {第,章},
-        number = \chinese{chapter},
-        beforeskip = 24pt,
-        afterskip = 18pt,
+        number = \arabic{chapter},
+        beforeskip = 1.04pt,
+        afterskip = 25.65pt,
         pagestyle = fancy
     },
     section = {
-        format = \sffamily\sanhao\bfseries,
+        format = \setstretch{1.5}\sffamily\sihao,
         beforeskip = 12pt,
         afterskip = 6pt
     },
     subsection = {
-        format = \sffamily\sihao\bfseries,
+        format = \setstretch{1.5}\sffamily\xiaosi,
         beforeskip = 6pt,
         afterskip = 6pt
     },
     subsubsection = {
-        format = \sffamily\xiaosi\bfseries,
+        number = \relax,
+        format = \normalfont,
         beforeskip = 6pt,
         afterskip = 6pt
     }
@@ -148,6 +154,30 @@
 % ------------------------------------------------------------
 % 目录格式设置
 % ------------------------------------------------------------
+% 重定义目录命令，完全手动控制目录页标题格式：
+% 三号黑体居中，中间空两个空格（\qquad），1.5倍行距，段前后0.5行距
+% 注意：tocloft 宏包会在加载时覆盖 \tableofcontents，因此使用 \AtBeginDocument
+% 确保在所有宏包初始化完成后再应用自定义定义。
+\AtBeginDocument{%
+  \renewcommand{\tableofcontents}{%
+      \clearpage
+      \thispagestyle{nofoot}%
+      \pagestyle{nofoot}%
+      \bgroup
+        \sffamily\sanhao
+        % 在页面顶部用零高度 hrule 锚定 vspace，防止被 TeX 丢弃
+        \hrule height 0pt depth 0pt
+        \nobreak
+        \vspace{\dimexpr 0.5\baselineskip-3.4pt\relax}%
+        {\centering 目\hspace{1em}录\par}%
+        \vspace{\dimexpr 0.5\baselineskip-6.5pt\relax}%
+      \egroup
+      \@starttoc{toc}%
+      \clearpage
+      \pagestyle{fancy}%
+  }%
+}
+
 \renewcommand{\cftchapfont}{\sffamily\xiaosi}
 \renewcommand{\cftsecfont}{\xiaosi}
 \renewcommand{\cftsubsecfont}{\xiaosi}
@@ -159,9 +189,25 @@
 % ------------------------------------------------------------
 % 页眉页脚设置
 % ------------------------------------------------------------
+
+% 页眉标志：true=固定文字，false=章节名
+\newif\if@thesisfixedheader
+\@thesisfixedheadertrue
+
+\newcommand{\thesisheaderfixed}{%
+  \wuhao\CJKfamily{kaitigb2312}
+  中国石油大学（华东）本科毕业设计(论文)%
+}
+
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[C]{\xiaowu 心河大学学位论文}
+\fancyhead[C]{%
+  \if@thesisfixedheader
+    \thesisheaderfixed
+  \else
+    \wuhao\CJKfamily{kaitigb2312}\leftmark
+  \fi
+}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -169,10 +215,50 @@
 % 章节首页页眉页脚
 \fancypagestyle{plain}{
     \fancyhf{}
-    \fancyhead[C]{\xiaowu 心河大学学位论文}
+    \fancyhead[C]{%
+      \if@thesisfixedheader
+        \thesisheaderfixed
+      \else
+        \wuhao\CJKfamily{kaitigb2312}\leftmark
+      \fi
+    }
     \fancyfoot[C]{\thepage}
     \renewcommand{\headrulewidth}{0.4pt}
 }
+
+% 有页眉但无页码的页眉页脚（摘要页、目录页使用）
+\fancypagestyle{nofoot}{
+    \fancyhf{}
+    \fancyhead[C]{%
+      \if@thesisfixedheader
+        \thesisheaderfixed
+      \else
+        \wuhao\CJKfamily{kaitigb2312}\leftmark
+      \fi
+    }
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+
+% 自动切换页眉模式
+\let\orig@frontmatter\frontmatter
+\renewcommand{\frontmatter}{\orig@frontmatter\@thesisfixedheadertrue}
+
+\let\orig@mainmatter\mainmatter
+% 移除 \cleardoublepage 以避免产生空白页，同时保留其他初始化
+\renewcommand{\mainmatter}{%
+    \clearpage
+    \@mainmattertrue
+    \pagenumbering{arabic}%
+    \@thesisfixedheaderfalse
+    \pagestyle{fancy}%
+}
+
+\let\orig@backmatter\backmatter
+\renewcommand{\backmatter}{\orig@backmatter\@thesisfixedheadertrue}
+
+\let\orig@appendix\appendix
+\renewcommand{\appendix}{\orig@appendix\@thesisfixedheadertrue}
 
 % ------------------------------------------------------------
 % 图表标题格式
@@ -185,6 +271,33 @@
 }
 \captionsetup[figure]{name={图}}
 \captionsetup[table]{name={表}}
+
+% ------------------------------------------------------------
+% 非浮动图表环境（严格跟随正文，禁止浮动到其他章节）
+% ------------------------------------------------------------
+% 图片：不浮动，紧跟正文位置
+\newenvironment{herefig}{%
+    \par\addvspace{\intextsep}%
+    \centering%
+    \captionsetup{type=figure}%
+}{%
+    \par\addvspace{\intextsep}%
+}
+
+% 表格：不浮动，紧跟正文位置
+\newenvironment{heretab}{%
+    \par\addvspace{\intextsep}%
+    \centering%
+    \captionsetup{type=table}%
+}{%
+    \par\addvspace{\intextsep}%
+}
+
+% 续表标记命令（用于 longtable 的 \endhead 之前）
+% 参数：表格总列数
+\newcommand{\continuedcaption}[1]{%
+    \multicolumn{#1}{r}{\small 续表\thetable} \\%
+}
 
 % ------------------------------------------------------------
 % 双语图表标题设置
@@ -206,11 +319,9 @@
 \renewcommand{\thefigure}{\thechapter-\arabic{figure}}
 \renewcommand{\thetable}{\thechapter-\arabic{table}}
 \renewcommand{\theequation}{\thechapter-\arabic{equation}}
-\makeatletter
 \@addtoreset{figure}{chapter}
 \@addtoreset{table}{chapter}
 \@addtoreset{equation}{chapter}
-\makeatother
 
 % ------------------------------------------------------------
 % 列表环境设置
@@ -278,45 +389,170 @@
 \submitdate{2026年3月}
 
 % ------------------------------------------------------------
+% 本科毕业设计封面专用列类型
+% ------------------------------------------------------------
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+% ------------------------------------------------------------
 % 封面生成命令
 % ------------------------------------------------------------
 \newcommand{\makecover}{%
     \begin{titlepage}
-        \centering
-        \vspace*{1cm}
+        \thispagestyle{empty}
         
-        % 学校名称
-        {\zihao{-2}\bfseries\CJKfamily{zhsong}\@university}
+        % 顶部Logo
+        \noindent
+        \includegraphics[width=7.31cm, height=1.80cm]{figture/logo.png}
         
         \vspace{1.5cm}
         
-        % 学位类型
-        {\zihao{2}\bfseries\CJKfamily{zhsong}\@degree}
+        % 标题：本科毕业设计（论文）
+        \begin{center}
+            {\sffamily\xiaochu\bfseries
+             本\hspace{0.5em}科\hspace{0.5em}毕\hspace{0.5em}业\hspace{0.5em}设\hspace{0.5em}计（论文）}
+        \end{center}
+        
+        \vspace{1.5cm}
+        
+        % 题目（悬挂缩进：文本前缩进5.92字符，右侧缩进0.15cm，单倍行距，黑体小二不加粗）
+        \noindent
+        \bgroup
+            \linespread{1}\selectfont
+            \sffamily\xiaoer
+            \leftskip=5.92\ccwd
+            \rightskip=0.15cm
+            \noindent\llap{题\hspace{1em}目：}%
+            \@title\par
+            \ifx\@subtitle\@empty\else
+                \vspace{0.3em}
+                \noindent\hspace*{5.92\ccwd}%
+                ——\@subtitle\par
+            \fi
+        \egroup
         
         \vspace{3cm}
         
-        % 论文题目
-        {\zihao{-2}\bfseries\CJKfamily{zhsong}\@title}
-        
-        \vspace{4cm}
-        
-        % 作者信息
-        {\zihao{4}
-        \begin{tabular}{rl}
-            \CJKfamily{zhsong}\textbf{学院名称：} & \CJKfamily{zhsong}\@college \\[0.8cm]
-            \CJKfamily{zhsong}\textbf{专业名称：} & \CJKfamily{zhsong}\@major \\[0.8cm]
-            \CJKfamily{zhsong}\textbf{作者姓名：} & \CJKfamily{zhsong}\@author \\[0.8cm]
-            \CJKfamily{zhsong}\textbf{学\qquad 号：} & \CJKfamily{zhsong}\@studentid \\[0.8cm]
-            \CJKfamily{zhsong}\textbf{指导教师：} & \CJKfamily{zhsong}\@advisor \\[0.8cm]
+        % 作者信息表格
+        \begin{center}
+        \renewcommand{\arraystretch}{1.0}
+        \begin{tabular}{M{3.44cm}M{8.32cm}}
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries 姓\hspace{2em}名：} & 
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries \@author} \\ \cline{2-2}
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries 学\hspace{2em}号：} & 
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries \@studentid} \\ \cline{2-2}
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries 学\hspace{2em}院：} & 
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries \@college} \\ \cline{2-2}
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries 专\hspace{2em}业：} & 
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries \@major} \\ \cline{2-2}
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries 指导教师：} & 
+            \rule{0pt}{1.13cm}{\myfangsong\sanhao\bfseries \@advisor} \\ \cline{2-2}
         \end{tabular}
-        }
+        \end{center}
         
         \vfill
         
-        % 提交日期
-        {\zihao{4}\bfseries\CJKfamily{zhsong}\@submitdate}
+        % 日期
+        \begin{center}
+            {\myfangsonggb\sanhao \@submitdate}
+        \end{center}
         
     \end{titlepage}
+}
+
+% ------------------------------------------------------------
+% 封面信息命令扩展
+% ------------------------------------------------------------
+\newcommand{\subtitle}[1]{\gdef\@subtitle{#1}}
+\subtitle{}
+
+% ------------------------------------------------------------
+% 英文标题命令
+% ------------------------------------------------------------
+\newcommand{\etitle}[1]{\gdef\@etitle{#1}}
+\newcommand{\esubtitle}[1]{\gdef\@esubtitle{#1}}
+\etitle{}
+\esubtitle{}
+
+% ------------------------------------------------------------
+% 中文摘要页环境
+% ------------------------------------------------------------
+\newenvironment{cabstractpage}{%
+  \clearpage
+  \thispagestyle{nofoot}%
+  % 最上方距离页眉20pt
+  \hrule height 0pt depth 0pt
+  \nobreak
+  \vspace{20pt}%
+  % 正标题：小二号黑体居中，不加粗，1.5倍行距，段前、段后0.5行间距
+  \bgroup
+    \xiaoer\sffamily
+    \vspace{2pt}%
+    {\centering\@title\par}
+    \vspace{2pt}%
+  \egroup
+  % 副标题：右对齐，小二黑体不加粗，1.5倍行距，段前、段后0.5行间距
+  \ifx\@subtitle\@empty\else
+    \bgroup
+      \xiaoer\sffamily
+      \vspace{2pt}%
+      {\raggedleft——\@subtitle\par}
+      \vspace{2pt}%
+    \egroup
+  \fi
+  % 摘要标题：三号黑体居中，中间空两个空格，1.5倍行距，段前、段后0.5行间距
+  \bgroup
+    \sanhao\sffamily
+    \vspace{2pt}%
+    {\centering 摘\qquad 要\par}
+    \vspace{2pt}%
+  \egroup
+  % 摘要正文格式
+  \setlength{\parindent}{2\ccwd}%
+  \normalfont\xiaosi
+}{%
+  \par
+}
+
+% ------------------------------------------------------------
+% 英文摘要页环境
+% ------------------------------------------------------------
+\newenvironment{eabstractpage}{%
+  \clearpage
+  \thispagestyle{nofoot}%
+  % 最上方距离页眉20pt
+  \hrule height 0pt depth 0pt
+  \nobreak
+  \vspace{20pt}%
+  % 英文标题：小二居中，不加粗
+  \ifx\@etitle\@empty\else
+    \bgroup
+      \xiaoer\rmfamily
+      \vspace{2pt}%
+      {\centering\@etitle\par}
+      \vspace{2pt}%
+    \egroup
+  \fi
+  % 英文副标题：右对齐，小二不加粗
+  \ifx\@esubtitle\@empty\else
+    \bgroup
+      \xiaoer\rmfamily
+      \vspace{2pt}%
+      {\raggedleft——\@esubtitle\par}
+      \vspace{2pt}%
+    \egroup
+  \fi
+  % Abstract标题：三号粗体居中
+  \bgroup
+    \sanhao\rmfamily\bfseries
+    \vspace{2pt}%
+    {\centering Abstract\par}
+    \vspace{2pt}%
+  \egroup
+  % 摘要正文格式
+  \setlength{\parindent}{2\ccwd}%
+  \normalfont\xiaosi
+}{%
+  \par
 }
 
 % ============================================================

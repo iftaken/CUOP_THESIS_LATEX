@@ -15,6 +15,7 @@ COMPILE_CMD: tectonic -X compile main.tex
 - **转换工具**：Pandoc（已安装）
 - **参考文献**：统一使用 `${BIB_FILE}` 管理
 - **输出要求**：PDF必须命名为 `${PDF_OUTPUT}`
+- **字体要求**: 特殊字体可以使用init.sh进行下载
 
 ## 核心工作流
 
