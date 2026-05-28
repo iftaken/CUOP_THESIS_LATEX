@@ -30,7 +30,7 @@
     top=2.5cm,
     bottom=2.5cm,
     headheight=15pt,
-    headsep=0pt,
+    headsep=10pt,
     footskip=30pt
 }
 
@@ -199,18 +199,20 @@
   中国石油大学（华东）本科毕业设计(论文)%
 }
 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[C]{%
-  \if@thesisfixedheader
-    \thesisheaderfixed
-  \else
-    \wuhao\CJKfamily{kaitigb2312}\leftmark
-  \fi
+\fancypagestyle{fancy}{
+    \fancyhf{}
+    \fancyhead[C]{%
+      \if@thesisfixedheader
+        \thesisheaderfixed
+      \else
+        \wuhao\CJKfamily{kaitigb2312}\leftmark
+      \fi
+    }
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0pt}
 }
-\fancyfoot[C]{\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0pt}
+\pagestyle{fancy}
 
 % 章节首页页眉页脚
 \fancypagestyle{plain}{
